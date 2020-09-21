@@ -26,8 +26,6 @@ class HomeScreen(Screen):
     def backspace(self, cursor):
         print(cursor)
     def fill_input(self, digit="", operation=""):
-        # print(f"Digit: {digit}")
-        # print(f"Operation: {operation}")
         if digit is not "":
             self.ids.input.text += digit
         if operation is not "":
