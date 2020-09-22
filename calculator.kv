@@ -12,6 +12,12 @@
                 pos: self.pos
                 size: self.size
         orientation: 'vertical'
+        Label:
+            id: warning
+            text: ""
+            size_hint_y: 0.05
+            font_size: 10
+            halign: 'right'
         TextInput:
             id: input
             text_hint: 'Enter number'
@@ -49,8 +55,7 @@
             FlatButton:
                 text: '<---'
                 on_release: root.backspace(input.cursor)
-                on_release: input.do_backspace()
-                on_release: root.fill_input(input.text)
+                # on_release: input.do_backspace()
             FlatButton:
                 id: seven
                 text: '7'
