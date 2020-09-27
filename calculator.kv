@@ -14,13 +14,13 @@
         orientation: 'vertical'
         Label:
             id: warning
+            markup: True
             text: ""
             size_hint_y: 0.05
-            font_size: 10
+            font_size: 15
             halign: 'right'
-        TextInput:
+        NumberInput:
             id: input
-            text_hint: 'Enter number'
             size_hint_y: 0.2
             font_size: '40px'
             background_color: hex('#111111')
@@ -33,7 +33,6 @@
             multiline: False
             background_active: ''
             focus: True
-            on_text: root.validate()
         Label:
             id: result
             text: ""
@@ -53,7 +52,9 @@
                 text: '%'
                 on_release: root.fill_input(self.text)
             FlatButton:
-                text: '<---'
+                font_name: 'fontawesome-free/fa-solid-900.ttf'
+                text: '\uf55a'
+                # text: '\u232b'
                 on_release: root.backspace(input.cursor)
                 # on_release: input.do_backspace()
             FlatButton:
@@ -79,7 +80,7 @@
                 text: '6'
                 on_release: root.fill_input(self.text)
             FlatButton:
-                text: '/'
+                text: '\u00f7'
                 on_release: root.fill_input("", self.text)
             FlatButton:
                 text: '1'
