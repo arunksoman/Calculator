@@ -89,10 +89,25 @@ class HomeScreen(Screen):
                 if operand_checker(operation).count(True) == 1 or operand_checker(operation).count(False) == 5:
                     operation = eval(operation)
                 else:
-                    splitted_operation = list(filter(lambda x: x, re.split(r'([-+*/%()])|\s+', operatioin)))
-                    for item in operation:
-                        print(item)
-                    return "To Do"
+                    splitted_operation = list(filter(lambda x: x, re.split(r'([-+*/%()])|\s+', operation)))
+                    operation = ""
+                    result = ""
+                    for index, item in enumerate(splitted_operation):
+                        print(f"item: {item}")
+                        if index < 3:
+                            operation += item
+                        if index >= 3:
+                            print("I am in else")
+                            operation += item
+                            # item = str(eval(operation))
+                        if index % 2 == 0 and not operation.endswith(('+', '-', '*', '/', '%')):
+                            result = str(eval(operation))
+                            print(40*"*")
+                            operation =  result
+                        print(f"result: {result}")
+                        print(f"index: {index}")
+                        print(f"operation: {operation}")
+                    return result
             operation_list.append(operation)
         new_operation_str = ''.join([str(operation) for operation in operation_list])
         splitted_operation = list(filter(lambda x: x, re.split(r'([-+*/%()])|\s+', new_operation_str)))
