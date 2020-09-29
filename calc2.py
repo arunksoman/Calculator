@@ -3,49 +3,25 @@ from kivy.event import EventDispatcher
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.textinput import TextInput
 from kivy.core.window import Window
-from kivy.animation import Animation
+from kivy.clock import Clock
 import decimal as d
-import math
 import re
+import calculation
 
+def show_keyboard(event):
+    app = App.get_running_app()
+    app.sm.get_screen('homescreen').ids.input.focus=True
 
-class KeypressListener(EventDispatcher):
-    def __init__(self, **kwargs):
-        self.register_event_type('on_test')
-        super(KeypressListener, self).__init__(**kwargs)
-    def calculation_from_keyboard(self, value):
-        app = App.get_running_app()
-        print("value: ", app.sm.get_screen('homescreen').ids.input.text)
-        final_result = str(HomeScreen().evaluate(str(value)))
-        print(f"Final Result: {final_result}")
-        app.sm.get_screen('homescreen').ids.input.focus=True
-        app.sm.get_screen('homescreen').ids.result.text = final_result
-        self.dispatch('on_test', value)
-    def on_test(self, *args):
-        pass
-
-def my_callback(value, *args):
-    # print("Hello, I got an event!", args)
-    pass
-
-def substract(num1, num2):
-    if num2 is not isinstance(num2, float):
-        num2 = float(num2)
-    len_num2 = len(str(num2).split('.')[1])
-    quantization_num = "{}.{}".format(0, "".zfill(len_num2))
-    unquantized_result = d.Decimal(num1) - d.Decimal(num2)
-    quantized_result = unquantized_result.quantize(d.Decimal(quantization_num))
-    print(quantized_result)
-    return quantized_result
-
-def operand_checker(validation_string, operand):
-    if validation_string.find(operand) != -1:
-        return True
-    return False
+    
+def operand_checker(validation_string):
+    print(f"Validation String {validation_string}")
+    operand_list = ['+', '-', '*', '/', '%']
+    print("Hai")
+    return [False if validation_string.find(operand) == -1 else True for operand in operand_list]
 
 
 class NumberInput(TextInput):
-        r = re.compile(r'^[-+]*?\d*[\*,\-,/,., +]?\d*$')
+        r = re.compile(r'^[-+]*?\d*[\*,\-,/,., +,(,), %]?\d*$')
         def insert_text(self, substring, from_undo=False):
             r = self.r
             app = App.get_running_app()
@@ -56,15 +32,26 @@ class NumberInput(TextInput):
                 print("String: ", substring)
                 s = substring
                 app.sm.get_screen('homescreen').ids.warning.text = ""
-                ev = KeypressListener()
-                ev.bind(on_test=my_callback)
-                ev.calculation_from_keyboard('test')
-                
             else:
                 app.sm.get_screen('homescreen').ids.warning.text = "[b][color=ff0000]Please Enter Valid number[/color][/b]"
                 s = substring.replace(substring, "")
             return super(NumberInput, self).insert_text(s, from_undo=from_undo)
 class HomeScreen(Screen):
+    def validate(self):
+        calc_operation = self.ids.input.text
+        if calc_operation.count('(') != calc_operation.count(')'):
+            self.ids.warning.text = "[b][color=ff0000]Bracket count mismatching[/color][/b]"
+        else:
+            self.ids.warning.text = ""
+        # print("Hai")
+        print("value: ", self.ids.input.text)
+        final_result = str(HomeScreen().evaluate(str(self.ids.input.text)))
+        print(f"Final Result: {final_result}")
+        self.ids.input.focus=True
+        self.ids.result.text = final_result
+
+    def clear_result(self):
+        self.ids.result.text = ""
     def backspace(self, cursor):
         print(cursor)
         if cursor != (0, 0):
@@ -86,24 +73,40 @@ class HomeScreen(Screen):
     def evaluate(self, calc_operation):
         if calc_operation == "":
             return ""
-        if calc_operation.endswith(('+', '-', '*', '/', '%')):
+            # return calc_operation[:-1]
+        if calc_operation.endswith(('+', '-', '*', '/', '%', '(')):
             return calc_operation[:-1]
-
-        #Fixed number cannot start with - symbol
-        if not calc_operation.find("-") != -1 or calc_operation.startswith('-'):
-            try:
-                result = eval(calc_operation)
-                return result
-            except Exception:
-                return "Error"
-        else:
-            # for now do same
-            num1, num2 = calc_operation.split('-')
-            num1, num2 = float(num1), float(num2)
-            return substract(num1, num2)
-
+        # try:
+        # result = eval(calc_operation)
+        # splitted_operation = list(filter(lambda x: x, re.split(r'([-+*/%()])|\s+', calc_operation)))
+        # if operand_checker(calc_operation).count(True) > 1:
+        #     return "To Do"
+        bracket_matching = re.findall("[^()]+", calc_operation)
+        print(bracket_matching)
+        operation_list = []
+        for operation in bracket_matching:
+            if not (operation.endswith(('+', '-', '*', '/', '%')) or operation.startswith(('+', '-', '*', '/', '%'))):
+                if operand_checker(operation).count(True) == 1 or operand_checker(operation).count(False) == 5:
+                    operation = eval(operation)
+                else:
+                    splitted_operation = list(filter(lambda x: x, re.split(r'([-+*/%()])|\s+', operatioin)))
+                    for item in operation:
+                        print(item)
+                    return "To Do"
+            operation_list.append(operation)
+        new_operation_str = ''.join([str(operation) for operation in operation_list])
+        splitted_operation = list(filter(lambda x: x, re.split(r'([-+*/%()])|\s+', new_operation_str)))
+        print(operand_checker(new_operation_str))
+        if operand_checker(new_operation_str).count(False) == 5:
+            return new_operation_str
+        if operand_checker(new_operation_str).count(True) == 1:
+            return eval(new_operation_str)
+        # except Exception:
+        #     return "Error"
+            
 class CalculatorApp(App):
     sm = ScreenManager()
+    Clock.schedule_interval(show_keyboard, 0.2)
     def build(self):
         CalculatorApp.sm.add_widget(HomeScreen(name ="homescreen"))
         return CalculatorApp.sm

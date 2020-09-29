@@ -33,6 +33,7 @@
             multiline: False
             background_active: ''
             focus: True
+            on_text: root.validate() if self.text != "" else root.clear_result()
         Label:
             id: result
             text: ""
