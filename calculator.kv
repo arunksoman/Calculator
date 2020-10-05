@@ -57,8 +57,8 @@
                 font_name: 'fontawesome-free/fa-solid-900.ttf'
                 text: '\uf55a'
                 # text: '\u232b'
-                on_release: root.backspace(input.cursor)
-                # on_release: input.do_backspace()
+                # on_release: root.backspace(input.cursor)
+                on_release: input.do_backspace()
             FlatButton:
                 id: seven
                 text: '7'
@@ -83,7 +83,8 @@
                 on_release: root.fill_input(self.text)
             FlatButton:
                 text: '\u00f7'
-                on_release: root.fill_input("", self.text)
+                exact_text: '/'
+                on_release: root.fill_input("", self.exact_text)
             FlatButton:
                 text: '1'
                 on_release: root.fill_input(self.text)

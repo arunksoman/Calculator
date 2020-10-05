@@ -4,7 +4,6 @@ from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.textinput import TextInput
 from kivy.core.window import Window
 from kivy.clock import Clock
-import decimal as d
 import re
 # import calculation
 
@@ -46,13 +45,6 @@ class HomeScreen(Screen):
 
     def clear_result(self):
         self.ids.result.text = ""
-    def backspace(self, cursor):
-        if cursor != (0, 0):
-            calculation = self.ids.input.text
-            calculation = calculation.replace(calculation[cursor[0] - 1], "")
-            self.ids.input.text = calculation
-            final_result = str(HomeScreen().evaluate(str(self.ids.input.text)))
-            self.ids.result.text = final_result
 
     def fill_input(self, digit="", operation=""):
         if digit != "":
@@ -83,8 +75,9 @@ class HomeScreen(Screen):
                 calc_operation = "".join(splitted_operation)
                 # print("Clac Operation with Brackets: ", calc_operation)
             bracket_matching = re.findall("[^()]+", calc_operation)
-            print(bracket_matching)
+            print("bracket_matching: ",bracket_matching)
             operation_list = []
+            count = 0
             for operation in bracket_matching:
                 if not (operation.endswith(('+', '-', '*', '/', '%')) or operation.startswith(('+', '-', '*', '/', '%'))):
                     if operand_checker(operation).count(True) == 1 or operand_checker(operation).count(False) == 5:
